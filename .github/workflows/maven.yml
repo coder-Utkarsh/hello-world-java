@@ -27,3 +27,21 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+
+    - name: Build Docker Image
+      run: docker build -t coder-Utkarsh/github-actions-docker-java-app:0.0.1.Release
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Push Docker Image
+      run: docker push coder-Utkarsh/github-actions-docker-java-app:0.0.1.Release
+      
+    - name: Deploy to QA Environment
+      run: docker run -p 5000:5000 coder-Utkarsh/github-actions-docker-java-app:0.0.1.Release
